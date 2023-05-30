@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useGetTransactionsQuery } from "state/api";
@@ -8,7 +8,8 @@ import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 const Transactions = () => {
   const theme = useTheme();
 
-  const [page, setPage] = useState(1);
+  // values to be sent to the backend
+  const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
@@ -52,34 +53,6 @@ const Transactions = () => {
     },
   ];
 
-  useEffect(() => {
-    if (data && data.totalPages) {
-      const currentPage = Math.min(Math.max(1, page), data.totalPages);
-      setPage(currentPage);
-    }
-  }, [data, page]);
-
-  const handlePageChange = (params) => {
-    setPage(params.page);
-  };
-
-  const handlePageSizeChange = (params) => {
-    setPageSize(params.pageSize);
-    setPage(1);
-  };
-
-  const handleSortModelChange = (params) => {
-    if (params.sortModel.length > 0) {
-      setSort({
-        field: params.sortModel[0].field,
-        sort: params.sortModel[0].sort,
-      });
-    } else {
-      setSort({});
-    }
-    setPage(1);
-  };
-
   return (
     <Box m="1.5rem 2.5rem">
       <Header title="TRANSACTIONS" subtitle="Entire list of transactions" />
@@ -122,9 +95,9 @@ const Transactions = () => {
           pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          onSortModelChange={handleSortModelChange}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
           componentsProps={{
             toolbar: { searchInput, setSearchInput, setSearch },
